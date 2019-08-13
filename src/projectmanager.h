@@ -49,11 +49,14 @@ public:
     QString workspace() const;
     QStringList imports() const;
     QString projectLocation() const;
+    QString themePath() const;
 
     void setProjectName(const QString &projectName);
     void setMainDocument(const QString &mainDocument);
     void setWorkspace(const QString &workspace);
     void setImports(const QStringList &imports);
+    void setThemePath(const QString &themePath);
+
 private:
     void reset();
 
@@ -63,4 +66,5 @@ private:
     QStringList m_imports;
     QString m_projectName;
     QString m_projectLocation;
+    QString m_themePath;
 };

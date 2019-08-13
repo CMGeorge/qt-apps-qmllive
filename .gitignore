@@ -24,3 +24,4 @@ branch-coverage
 *.pc
 .qmake.stash
 *.qmlc
+lib

@@ -41,6 +41,7 @@
 const QLatin1String MainKey("main");
 const QLatin1String WorkspaceKey("workspace");
 const QLatin1String ImportsKey("imports");
+const QLatin1String ThemeKey("qmlstyle");
 const QLatin1String QMLLiveExtension(".qmllive");
 
 ProjectManager::ProjectManager(QObject *parent)
@@ -87,6 +88,10 @@ bool ProjectManager::read(const QString &path)
         for (QJsonValue value : imports)
             m_imports.append(value.toString());
     }
+    if (root.contains(ThemeKey)) {
+        QString tmpPath = root.value(ThemeKey).toString();
+        m_themePath = tmpPath; /*= QFileInfo(file).path() + "/" + tmpPath;*/
+    }
     return true;
 }
 
@@ -106,6 +111,7 @@ void ProjectManager::write(const QString &path)
     for (const QString &import : m_imports)
         imports.append(QJsonValue(import));
     root.insert(ImportsKey, imports);
+    root.insert(ThemeKey, m_themePath);
     QJsonDocument document(root);
     file.write(document.toJson());
 }
@@ -138,6 +144,7 @@ QString ProjectManager::projectLocation() const
     return m_projectLocation;
 }
 
+QString ProjectManager::themePath() const { return m_themePath; }
 void ProjectManager::reset()
 {
     m_mainDocument = QString("main.qml");
@@ -162,3 +169,6 @@ void ProjectManager::setImports(const QStringList &imports)
     m_imports = imports;
 }
 
+void ProjectManager::setThemePath(const QString &themePath) {
+    m_themePath = themePath;
+}

@@ -47,6 +47,7 @@ class HostsOptionsPage;
 class HostModel;
 class Host;
 class AppearanceOptionPage;
+class ThemePathOptionPage;
 
 class OptionsDialog : public QDialog
 {
@@ -75,4 +76,5 @@ private:
     ImportPathOptionPage *m_importPathsForm;
     HostsOptionsPage *m_hostsForm;
     AppearanceOptionPage *m_appearanceForm;
+    ThemePathOptionPage *m_themeForm;
 };

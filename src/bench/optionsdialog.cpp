@@ -31,20 +31,20 @@
 ****************************************************************************/
 
 #include "optionsdialog.h"
-#include "ui_optionsdialog.h"
+#include "ThemePathOptionPage.h"
+#include "appearanceoptionpage.h"
+#include "hostsoptionpage.h"
 #include "httpproxyoptionpage.h"
 #include "importpathoptionpage.h"
-#include "hostsoptionpage.h"
-#include "appearanceoptionpage.h"
+#include "ui_optionsdialog.h"
 
 OptionsDialog::OptionsDialog(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::OptionsDialog)
-    , m_httpProxyForm(new HttpProxyOptionPage(this))
-    , m_importPathsForm(new ImportPathOptionPage(this))
-    , m_hostsForm(new HostsOptionsPage(this))
-    , m_appearanceForm(new AppearanceOptionPage(this))
-{
+    : QDialog(parent), ui(new Ui::OptionsDialog),
+      m_httpProxyForm(new HttpProxyOptionPage(this)),
+      m_importPathsForm(new ImportPathOptionPage(this)),
+      m_hostsForm(new HostsOptionsPage(this)),
+      m_appearanceForm(new AppearanceOptionPage(this)),
+      m_themeForm(new ThemePathOptionPage(this)) {
     ui->setupUi(this);
 
     QListWidgetItem *item = new QListWidgetItem("HTTP Proxy");
@@ -65,6 +65,11 @@ OptionsDialog::OptionsDialog(QWidget *parent)
 
     item = new QListWidgetItem("Appearance");
     index = ui->optionsStack->addWidget(m_appearanceForm);
+    item->setData(Qt::UserRole, index);
+    ui->optionsView->addItem(item);
+
+    item = new QListWidgetItem("Custom StylePath");
+    index = ui->optionsStack->addWidget(m_themeForm);
     item->setData(Qt::UserRole, index);
     ui->optionsView->addItem(item);
 
@@ -106,6 +111,7 @@ void OptionsDialog::accept()
     m_importPathsForm->apply();
     m_hostsForm->apply();
     m_appearanceForm->apply();
+    m_themeForm->apply();
     QDialog::accept();
 }
 
