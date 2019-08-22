@@ -47,7 +47,7 @@ class ImportPathOptionPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit ImportPathOptionPage(QWidget *parent = 0);
+    explicit ImportPathOptionPage(QWidget *parent = nullptr);
     ~ImportPathOptionPage();
     void apply();
     void setImports(const QStringList &imports);

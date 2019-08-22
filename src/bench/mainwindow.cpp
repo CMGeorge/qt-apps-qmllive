@@ -32,6 +32,7 @@
 
 #include "mainwindow.h"
 #include "widgets/windowwidget.h"
+#include <QQuickStyle>
 
 #include <QToolBar>
 #include <QtNetwork>
@@ -95,26 +96,32 @@ private:
 };
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , m_initialized(false)
-    , m_workspaceView(new WorkspaceView())
-    , m_log(new LogView(true, this))
-    , m_hostManager(new HostManager(this))
-    , m_hostModel(new HostModel(this))
-    , m_discoveryManager(new HostDiscoveryManager(this))
-    , m_allHosts(new AllHostsWidget(this))
-    , m_hub(new LiveHubEngine(this))
-    , m_node(new BenchLiveNodeEngine(this))
-    , m_newProjectWizard(new NewProjectWizard(this))
-    , m_projectManager(new ProjectManager(this))
-    , m_imports (nullptr)
-    , m_runtimeManager(new RuntimeManager(this))
-{
+    //<<<<<<< HEAD
+    : QMainWindow(parent), m_initialized(false),
+      m_workspaceView(new WorkspaceView()), m_log(new LogView(true, this)),
+      m_hostManager(new HostManager(this)), m_hostModel(new HostModel(this)),
+      m_discoveryManager(new HostDiscoveryManager(this)),
+      m_allHosts(new AllHostsWidget(this)), m_hub(new LiveHubEngine(this)),
+      m_node(new BenchLiveNodeEngine(this)),
+      m_newProjectWizard(new NewProjectWizard(this)),
+      m_projectManager(new ProjectManager(this)), m_imports(nullptr),
+      m_runtimeManager(new RuntimeManager(this)) {
+    //=======
+    //    : QMainWindow(parent), m_initialized(false),
+    //      m_workspace(new WorkspaceView()), m_log(new LogView(true, this)),
+    //      m_hostManager(new HostManager(this)), m_hostModel(new
+    //      HostModel(this)), m_discoveryManager(new
+    //      HostDiscoveryManager(this)), m_allHosts(new AllHostsWidget(this)),
+    //      m_hub(new LiveHubEngine(this)), m_node(new
+    //      BenchLiveNodeEngine(this)), m_newProjectWizard(new
+    //      NewProjectWizard(this)), m_projectManager(new ProjectManager(this))
+    //      {
+    //>>>>>>> bd54d093e51226a9c7035ebd3b0f2533015d5ddb
     setupContent();
     setupMenuBar();
     setupToolBar();
 
-    m_discoveryManager->setKnownHostsModel(m_hostModel);\
+    m_discoveryManager->setKnownHostsModel(m_hostModel);
 
     m_hostManager->setModel(m_hostModel);
     m_hostManager->setLiveHubEngine(m_hub);
@@ -671,6 +678,14 @@ void MainWindow::openProjectFile(const QString &path)
         s.endArray();
 
         setImportPaths(paths);
+        if (!m_projectManager->themePath().isEmpty()) {
+            QString _fullPath =
+                QFileInfo(path).path() + "/" + m_projectManager->themePath();
+            s.setValue("qmlstyle", _fullPath);
+            // TODO: Add restart message to apply style path
+            qDebug() << "Setting style to " << _fullPath;
+            QQuickStyle::setStyle(_fullPath);
+        }
         QString path = QDir(m_projectManager->projectLocation()).absoluteFilePath(m_projectManager->workspace());
         setWorkspace(m_projectManager->workspace());
         activateDocument(LiveDocument(m_projectManager->mainDocument()));

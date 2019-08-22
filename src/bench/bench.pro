@@ -5,9 +5,10 @@ TARGET = qmllivebench
 DESTDIR = $$BUILD_DIR/bin
 
 CONFIG += c++11
-QT *= gui core quick widgets core-private
+QT *= gui core quick widgets core-private quickcontrols2
 
 SOURCES += \
+    ThemePathOptionPage.cpp \
     aboutdialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -35,6 +36,7 @@ SOURCES += \
     runtimeoptionpage.cpp
 
 HEADERS += \
+    ThemePathOptionPage.h \
     aboutdialog.h \
     mainwindow.h \
     optionsdialog.h \
@@ -61,6 +63,7 @@ HEADERS += \
     runtimeoptionpage.h
 
 FORMS += \
+    ThemePathOptionPage.ui \
     optionsdialog.ui \
     hostsoptionpage.ui \
     httpproxyoptionpage.ui \

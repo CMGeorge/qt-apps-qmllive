@@ -40,7 +40,7 @@
 
 #include <QFileIconProvider>
 #include <QQmlImageProviderBase>
-
+#include <QQuickStyle>
 BenchLiveNodeEngine::BenchLiveNodeEngine(QObject *parent)
     : LiveNodeEngine(parent),
       m_ww(0),
@@ -48,10 +48,16 @@ BenchLiveNodeEngine::BenchLiveNodeEngine(QObject *parent)
       m_workspaceView(0),
       m_clipToRootObject(false)
 {
-    setQmlEngine(new QQmlEngine(this));
-    setFallbackView(new QQuickView(qmlEngine(), 0));
-
-    qmlEngine()->addImageProvider("qmlLiveDirectoryPreview", m_imageProvider);
+    //    QQuickStyle::setStyle("SanaSoft");
+    //    QQuickStyle::setStyle(
+    //        "/Users/cmgeorge/Dev/REEA/Qt/SanaSoft/apps/QMLDesktop/qml/SanaSoft");
+    QSettings s;
+    if (s.contains("qmlstyle") &&
+        !s.value("qmlstyle", "").toString().isEmpty()) {
+        QQuickStyle::setStyle(s.value("qmlstyle").toString());
+    }
+    //    qDebug() << "Should set: " << s.value("qmlstyle").toString();
+    initEngine();
 }
 
 BenchLiveNodeEngine::~BenchLiveNodeEngine()
@@ -100,6 +106,14 @@ QImage BenchLiveNodeEngine::convertIconToImage(const QFileInfo &info, const QSiz
     QPainter painter(&img);
     icon.paint(&painter, QRect(QPoint(0,0), requestedSize));
     return img;
+}
+
+void BenchLiveNodeEngine::initEngine() {
+    setQmlEngine(new QQmlEngine(this));
+    setFallbackView(new QQuickView(qmlEngine(), 0));
+    // TODO: Allow use configurations
+    qmlEngine()->rootContext()->setContextProperty("isCMGDebug", true);
+    qmlEngine()->addImageProvider("qmlLiveDirectoryPreview", m_imageProvider);
 }
 
 void BenchLiveNodeEngine::initPlugins()

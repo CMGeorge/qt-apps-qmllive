@@ -590,10 +590,11 @@ void SlaveApplication::forwardArguments()
 
     socket->connectToServer(serverName());
 }
-
-int main(int argc, char** argv)
-{
+#include <QQuickStyle>
+int main(int argc, char **argv) {
     QScopedPointer<Application> app(Application::create(argc, argv));
+    //    QQuickStyle::setStyle(
+    //        "/Users/cmgeorge/Dev/REEA/Qt/SanaSoft/apps/QMLDesktop/qml/SanaSoft");
     return app->exec();
 }
 

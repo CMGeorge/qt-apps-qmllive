@@ -57,11 +57,13 @@ protected:
     void reloadHelper();
 
 private Q_SLOTS:
-    QImage convertIconToImage(const QFileInfo& info, const QSize& requestedSize);
+    QImage convertIconToImage(const QFileInfo &info,
+                              const QSize &requestedSize);
 
 private:
     WindowWidget* m_ww;
     QPointer<PreviewImageProvider> m_imageProvider;
     WorkspaceView* m_workspaceView;
     bool m_clipToRootObject;
+    void initEngine();
 };

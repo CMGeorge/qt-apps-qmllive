@@ -48,6 +48,7 @@ class HostModel;
 class Host;
 class AppearanceOptionPage;
 class RuntimeOptionPage;
+class ThemePathOptionPage;
 
 class OptionsDialog : public QDialog
 {
@@ -80,4 +81,5 @@ private:
     HostsOptionsPage *m_hostsForm;
     RuntimeOptionPage *m_runtimeForm;
     AppearanceOptionPage *m_appearanceForm;
+    ThemePathOptionPage *m_themeForm;
 };

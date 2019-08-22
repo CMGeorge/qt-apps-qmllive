@@ -200,7 +200,7 @@ int main(int argc, char** argv)
     QQmlEngine qmlEngine;
     qmlEngine.setImportPathList(options.importPaths + qmlEngine.importPathList());
 
-    QQuickView fallbackView(&qmlEngine, 0);
+    QQuickView fallbackView(&qmlEngine, nullptr);
 
     LiveNodeEngine::WorkspaceOptions workspaceOptions = LiveNodeEngine::LoadDummyData | LiveNodeEngine::AllowUpdates;
     if (options.updatesAsOverlay)
