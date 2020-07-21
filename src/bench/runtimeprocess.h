@@ -48,6 +48,7 @@ public:
     void setLiveHubEngine(LiveHubEngine *engine);
     void connectToServer();
     void connectToServer(int msecs);
+    int port() const;
 
 Q_SIGNALS:
     void connected();
@@ -61,11 +62,11 @@ private Q_SLOTS:
     void sendDocument(const LiveDocument &document);
     void updateOutput();
     void updateErrors();
-
+    void onStateChanged();
 private:
     bool m_ismaster;
+    bool m_doNotConnect;
     int m_port;
-    int m_waitToConnect;
     RemotePublisher m_publisher;
     QPointer<LiveHubEngine> m_engine;
     LiveDocument *m_document;

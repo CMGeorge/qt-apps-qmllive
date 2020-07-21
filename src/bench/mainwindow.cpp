@@ -104,8 +104,10 @@ MainWindow::MainWindow(QWidget *parent)
       m_allHosts(new AllHostsWidget(this)), m_hub(new LiveHubEngine(this)),
       m_node(new BenchLiveNodeEngine(this)),
       m_newProjectWizard(new NewProjectWizard(this)),
-      m_projectManager(new ProjectManager(this)), m_imports(nullptr),
-      m_runtimeManager(new RuntimeManager(this)) {
+      m_projectManager(new ProjectManager(this))
+      , m_imports(nullptr),
+      m_runtimeManager(new RuntimeManager(this))
+      , m_closeEvent(false) {
     //=======
     //    : QMainWindow(parent), m_initialized(false),
     //      m_workspace(new WorkspaceView()), m_log(new LogView(true, this)),
@@ -157,6 +159,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    if (!m_closeEvent)
+        writeSettings();
     m_runtimeManager->finishProcesses();
     delete m_runtimeManager;
 }
@@ -407,6 +411,7 @@ void MainWindow::init()
 
 void MainWindow::writeSettings()
 {
+    qInfo() << "Writing QML Live Bench user settings...";
     QSettings s;
     s.setValue("geometry", saveGeometry());
     s.setValue("windowState", saveState());
@@ -536,6 +541,7 @@ void MainWindow::setProject(const QString &projectFile)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    m_closeEvent = true;
     writeSettings();
     m_runtimeManager->finishProcesses();
     QMainWindow::closeEvent(event);
@@ -677,6 +683,8 @@ void MainWindow::openProjectFile(const QString &path)
         }
         s.endArray();
 
+        m_runtimeManager->restartAll();
+
         setImportPaths(paths);
         if (!m_projectManager->themePath().isEmpty()) {
             QString _fullPath =
@@ -689,7 +697,6 @@ void MainWindow::openProjectFile(const QString &path)
         QString path = QDir(m_projectManager->projectLocation()).absoluteFilePath(m_projectManager->workspace());
         setWorkspace(m_projectManager->workspace());
         activateDocument(LiveDocument(m_projectManager->mainDocument()));
-        m_runtimeManager->restartAll();
     }
     else {
         qWarning() << "Unable to read project document: "<<path;

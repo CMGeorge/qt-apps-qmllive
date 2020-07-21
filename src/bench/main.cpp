@@ -43,6 +43,8 @@
 #include "qmllive_version.h"
 #include "projectmanager.h"
 
+#include <signal.h>
+
 class Application : public QApplication
 {
     Q_OBJECT
@@ -96,6 +98,23 @@ private:
 };
 
 Options *Application::s_options = 0;
+
+void catchExitSignals(const std::vector<int>& quitSignals,
+                      const std::vector<int>& ignoreSignals = std::vector<int>()) {
+
+    auto handler = [](int sig) ->void {
+        qInfo("\nQuit the application (user request signal = %d).\n", sig);
+        Application::quit();
+    };
+
+    // all these signals will be ignored.
+    for ( int sig : ignoreSignals )
+        signal(sig, SIG_IGN);
+
+    // each of these signals calls the handler (quits the QCoreApplication).
+    for ( int sig : quitSignals )
+        signal(sig, handler);
+}
 
 Application *Application::create(int &argc, char **argv)
 {
@@ -595,6 +614,15 @@ int main(int argc, char **argv) {
     QScopedPointer<Application> app(Application::create(argc, argv));
     //    QQuickStyle::setStyle(
     //        "/Users/cmgeorge/Dev/REEA/Qt/SanaSoft/apps/QMLDesktop/qml/SanaSoft");
+
+#if defined (Q_OS_UNIX) || defined (Q_OS_MACOS)
+    catchExitSignals({SIGQUIT, SIGINT, SIGTERM, SIGHUP, SIGABRT}); // Linux + Mac
+#endif
+
+#ifdef Q_OS_WIN
+    catchExitSignals({SIGINT, SIGTERM, SIGABRT}); // Windows
+#endif
+
     return app->exec();
 }
 

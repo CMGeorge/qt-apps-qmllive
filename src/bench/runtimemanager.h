@@ -57,6 +57,8 @@ public:
 
 private:
     QStringList argumentsList(const int& port, const QString& titles, const bool hideButtons = false);
+    void restartPrimeRuntime();
+    void stopPrimeRuntime();
 
 signals:
     void logWidgetAdded(QDockWidget* log);
@@ -65,13 +67,13 @@ signals:
 public slots:
     void onPrimeRuntimeError(QProcess::ProcessError error);
     void onPrimeRuntimeChanged();
+    void onPrimeRuntimeConnected();
     void setPrimeCurrentFile(const LiveDocument &currentFile);
     void newRuntimeWindow(const QString &document);
     void initConnectToServer();
     void onConnected();
     void onRuntimeStarted();
     void updateRuntimePath(const QString& path);
-    void restartPrimeRuntime();
     void onError(QProcess::ProcessError error);
 
 private:
@@ -86,6 +88,8 @@ private:
     QString* m_pluginPath;
     QList<QDockWidget*> m_logDocks;
     QList<RuntimeProcess*> m_runtimes;
+    bool m_primeRuntimeConnected;
+    LiveDocument* m_primeCurrentFile;
 };
 
 #endif // RUNTIMEMANAGER_H
