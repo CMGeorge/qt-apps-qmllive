@@ -79,7 +79,7 @@ public:
     int rotation() const;
 
     QString workspace() const;
-    void setWorkspace(const QString &path, WorkspaceOptions options = NoWorkspaceOption);
+    void setWorkspace(const QString &path, WorkspaceOptions options = LoadDummyData);
     ResourceMap *resourceMap() const;
 
     void setPluginPath(const QString& path);

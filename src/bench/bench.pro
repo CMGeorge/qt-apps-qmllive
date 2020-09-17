@@ -6,7 +6,7 @@ else:TARGET = qmllivebench
 DESTDIR = $$BUILD_DIR/bin
 
 CONFIG += c++11
-QT *= gui core quick widgets core-private
+QT *= gui core quick widgets core-private quickcontrols2
 
 macx* {
     LIBS += -framework AppKit -framework Foundation

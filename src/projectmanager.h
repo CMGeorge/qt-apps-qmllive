@@ -48,12 +48,19 @@ public:
     QString mainDocument() const;
     QString workspace() const;
     QStringList imports() const;
+    QStringList libs() const;
+    QVariantMap contextProperties() const;
     QString projectLocation() const;
+    QString themePath() const;
 
     void setProjectName(const QString &projectName);
     void setMainDocument(const QString &mainDocument);
     void setWorkspace(const QString &workspace);
     void setImports(const QStringList &imports);
+    void setContextProperties(const QVariantMap &contextProperties);
+    void setLibs(const QStringList &libs);
+    void setThemePath(const QString &themePath);
+
 private:
     void reset();
 
@@ -61,6 +68,9 @@ private:
     QString m_mainDocument;
     QString m_workspace;
     QStringList m_imports;
+    QStringList m_libs;
+    QVariantMap m_contextProperties;
     QString m_projectName;
     QString m_projectLocation;
+    QString m_themePath;
 };

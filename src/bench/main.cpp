@@ -620,8 +620,7 @@ void SlaveApplication::forwardArguments()
     socket->connectToServer(serverName());
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
     QScopedPointer<Application> app(Application::create(argc, argv));
 
 #if defined (Q_OS_UNIX) || defined (Q_OS_MACOS)

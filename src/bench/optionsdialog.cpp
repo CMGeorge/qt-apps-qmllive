@@ -31,22 +31,24 @@
 ****************************************************************************/
 
 #include "optionsdialog.h"
-#include "ui_optionsdialog.h"
+//#include "ThemePathOptionPage.h"
+#include "appearanceoptionpage.h"
+#include "hostsoptionpage.h"
 #include "httpproxyoptionpage.h"
 #include "importpathoptionpage.h"
-#include "hostsoptionpage.h"
 #include "runtimeoptionpage.h"
-#include "appearanceoptionpage.h"
-
+#include "ui_optionsdialog.h"
 OptionsDialog::OptionsDialog(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::OptionsDialog)
-    , m_httpProxyForm(new HttpProxyOptionPage(this))
-    , m_importPathsForm(new ImportPathOptionPage(this))
-    , m_hostsForm(new HostsOptionsPage(this))
-    , m_runtimeForm(new RuntimeOptionPage(this))
-    , m_appearanceForm(new AppearanceOptionPage(this))
+    : QDialog(parent), ui(new Ui::OptionsDialog),
+      m_httpProxyForm(new HttpProxyOptionPage(this)),
+      m_importPathsForm(new ImportPathOptionPage(this)),
+      m_hostsForm(new HostsOptionsPage(this)),
+      m_runtimeForm(new RuntimeOptionPage(this)),
+      m_appearanceForm(new AppearanceOptionPage(this))
+//      ,
+//      m_themeForm(new ThemePathOptionPage(this))
 {
+
     ui->setupUi(this);
 
     QListWidgetItem *item = new QListWidgetItem("HTTP Proxy");
@@ -75,42 +77,37 @@ OptionsDialog::OptionsDialog(QWidget *parent)
     item->setData(Qt::UserRole, index);
     ui->optionsView->addItem(item);
 
-    connect(ui->optionsView, &QListWidget::currentItemChanged,
-            this, &OptionsDialog::optionSelected);
-    connect(m_runtimeForm, &RuntimeOptionPage::updateRuntimePath, this, &OptionsDialog::updateRuntimePath);
-    connect(m_appearanceForm, &AppearanceOptionPage::hideNonQMLFiles, this, &OptionsDialog::hideNonQMLFiles);
-    connect(m_importPathsForm, &ImportPathOptionPage::updateImportPaths, this, &OptionsDialog::updateImportPaths);
+    connect(ui->optionsView, &QListWidget::currentItemChanged, this,
+            &OptionsDialog::optionSelected);
+    connect(m_runtimeForm, &RuntimeOptionPage::updateRuntimePath, this,
+            &OptionsDialog::updateRuntimePath);
+    connect(m_appearanceForm, &AppearanceOptionPage::hideNonQMLFiles, this,
+            &OptionsDialog::hideNonQMLFiles);
+    connect(m_importPathsForm, &ImportPathOptionPage::updateImportPaths, this,
+            &OptionsDialog::updateImportPaths);
 }
 
-OptionsDialog::~OptionsDialog()
-{
-    delete ui;
-}
+OptionsDialog::~OptionsDialog() { delete ui; }
 
-void OptionsDialog::setHostModel(HostModel *model)
-{
+void OptionsDialog::setHostModel(HostModel *model) {
     m_hostsForm->setHostModel(model);
 }
 
-void OptionsDialog::setDiscoveredHostsModel(HostModel *model)
-{
+void OptionsDialog::setDiscoveredHostsModel(HostModel *model) {
     m_hostsForm->setDiscoveredHostsModel(model);
 }
 
-void OptionsDialog::openHostConfig(Host *host)
-{
+void OptionsDialog::openHostConfig(Host *host) {
     ui->optionsView->setCurrentRow(2);
     m_hostsForm->setHostSelected(host);
 }
 
-void OptionsDialog::optionSelected(QListWidgetItem *current)
-{
+void OptionsDialog::optionSelected(QListWidgetItem *current) {
     int index = current->data(Qt::UserRole).toInt();
     ui->optionsStack->setCurrentIndex(index);
 }
 
-void OptionsDialog::accept()
-{
+void OptionsDialog::accept() {
     m_httpProxyForm->apply();
     m_importPathsForm->apply();
     m_hostsForm->apply();
@@ -119,13 +116,8 @@ void OptionsDialog::accept()
     QDialog::accept();
 }
 
-void OptionsDialog::reject()
-{
-    QDialog::reject();
-}
+void OptionsDialog::reject() { QDialog::reject(); }
 
-void OptionsDialog::setImports(const QStringList &imports)
-{
+void OptionsDialog::setImports(const QStringList &imports) {
     m_importPathsForm->setImports(imports);
 }
-

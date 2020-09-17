@@ -40,16 +40,20 @@
 #include <QFileIconProvider>
 #include <QQmlImageProviderBase>
 
+#include <QQuickStyle>
 BenchLiveNodeEngine::BenchLiveNodeEngine(QObject *parent)
     : LiveNodeEngine(parent),
       m_imageProvider(new PreviewImageProvider(this)),
       m_workspaceView(0),
       m_clipToRootObject(false)
 {
-    setQmlEngine(new QQmlEngine(this));
-    setFallbackView(new QQuickView(qmlEngine(), 0));
-
-    qmlEngine()->addImageProvider("qmlLiveDirectoryPreview", m_imageProvider);
+    QSettings s;
+    if (s.contains("qmlstyle") &&
+        !s.value("qmlstyle", "").toString().isEmpty()) {
+        qDebug() << "Load Theme... " << s.value("qmlstyle");
+        QQuickStyle::setStyle(s.value("qmlstyle").toString());
+    }
+    initEngine();
 }
 
 BenchLiveNodeEngine::~BenchLiveNodeEngine()
@@ -93,6 +97,30 @@ QImage BenchLiveNodeEngine::convertIconToImage(const QFileInfo &info, const QSiz
     QPainter painter(&img);
     icon.paint(&painter, QRect(QPoint(0,0), requestedSize));
     return img;
+}
+
+void BenchLiveNodeEngine::initEngine() {
+    setQmlEngine(new QQmlEngine(this));
+    setFallbackView(new QQuickView(qmlEngine(), 0));
+    // TODO: Allow use configurations
+    QSettings s;
+    qDebug() << "Conains? " << s.allKeys().contains("contextProperties")<<s.value("contextProperties")<<s.allKeys();
+//    if (s.allKeys().contains("contextProperties")) {
+//        qDebug() <<"All keys? "<< s.allKeys();
+        s.beginGroup("contextProperties");
+        QStringList _keys = s.allKeys();
+        for (int i = 0; i < _keys.length(); i++) {
+            qmlEngine()->rootContext()->setContextProperty(
+                _keys.at(i), s.value(_keys.at(i)));
+            qDebug() << "Register " << _keys.at(i) << s.value(_keys.at(i));
+        }
+//        int size = s.beginGroup("contextProperties");
+//    }
+
+    qmlEngine()->rootContext()->setContextProperty("isCMGDebug", true);
+    qmlEngine()->rootContext()->setContextProperty("sqlDefaultConnectionName",
+                                             "mainConnection");
+    qmlEngine()->addImageProvider("qmlLiveDirectoryPreview", m_imageProvider);
 }
 
 void BenchLiveNodeEngine::initPlugins()

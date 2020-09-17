@@ -31,6 +31,7 @@
 ****************************************************************************/
 
 #include "mainwindow.h"
+#include <QQuickStyle>
 
 #include <QToolBar>
 #include <QtNetwork>
@@ -94,27 +95,22 @@ private:
 };
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , m_initialized(false)
-    , m_workspaceView(new WorkspaceView())
-    , m_log(new LogView(true, this))
-    , m_hostManager(new HostManager(this))
-    , m_hostModel(new HostModel(this))
-    , m_discoveryManager(new HostDiscoveryManager(this))
-    , m_allHosts(new AllHostsWidget(this))
-    , m_hub(new LiveHubEngine(this))
-    , m_node(new BenchLiveNodeEngine(this))
-    , m_newWorkspaceConfigWizard(new NewProjectWizard(this))
-    , m_projectManager(new ProjectManager(this))
-    , m_imports (nullptr)
-    , m_runtimeManager(new RuntimeManager(this))
-    , m_closeEvent(false)
-{
+    : QMainWindow(parent), m_initialized(false),
+      m_workspaceView(new WorkspaceView()), m_log(new LogView(true, this)),
+      m_hostManager(new HostManager(this)), m_hostModel(new HostModel(this)),
+      m_discoveryManager(new HostDiscoveryManager(this)),
+      m_allHosts(new AllHostsWidget(this)), m_hub(new LiveHubEngine(this)),
+      m_node(new BenchLiveNodeEngine(this)),
+      m_newWorkspaceConfigWizard(new NewProjectWizard(this)),
+      m_projectManager(new ProjectManager(this))
+      , m_imports(nullptr),
+      m_runtimeManager(new RuntimeManager(this))
+      , m_closeEvent(false) {
     setupContent();
     setupMenuBar();
     setupToolBar();
 
-    m_discoveryManager->setKnownHostsModel(m_hostModel);\
+    m_discoveryManager->setKnownHostsModel(m_hostModel);
 
     m_hostManager->setModel(m_hostModel);
     m_hostManager->setLiveHubEngine(m_hub);
@@ -411,6 +407,28 @@ void MainWindow::writeSettings()
             s.setValue("path", *i);
         }
         s.endArray();
+
+
+    }
+    s.beginWriteArray("libs");
+    for (int i = 0; i < m_projectManager->libs().count(); i++) {
+        s.setArrayIndex(i);
+        s.setValue("path", m_projectManager->libs().at(i));
+    }
+    s.endArray();
+
+    s.beginGroup("contextProperties");
+    QStringList _contextKeys = m_projectManager->contextProperties().keys();
+    for (int i = 0; i < _contextKeys.count(); i++) {
+        s.setValue(_contextKeys.at(i),
+                   m_projectManager->contextProperties().value(
+                       _contextKeys.at(i)));
+    }
+    s.endGroup();
+    if (!m_projectManager->themePath().isEmpty()) {
+        QString _fullPath = m_projectManager->themePath();
+        s.setValue("qmlstyle", _fullPath);
+        qDebug() << "Setting style to " << _fullPath;
     }
 }
 
@@ -658,9 +676,33 @@ void MainWindow::openWorkspaceConfigFile(const QString &path)
         }
         s.endArray();
 
+        s.beginWriteArray("libs");
+        for (int i = 0; i < m_projectManager->libs().count(); i++) {
+            s.setArrayIndex(i);
+            s.setValue("path", m_projectManager->libs().at(i));
+        }
+        s.endArray();
+
+        s.beginGroup("contextProperties");
+        qDebug() << m_projectManager->contextProperties();
+        QStringList _contextKeys = m_projectManager->contextProperties().keys();
+        for (int i = 0; i < _contextKeys.count(); i++) {
+            s.setValue(_contextKeys.at(i),
+                       m_projectManager->contextProperties().value(
+                           _contextKeys.at(i)));
+        }
+        s.endGroup();
         m_runtimeManager->restartAll();
 
         setImportPaths(paths);
+        if (!m_projectManager->themePath().isEmpty()) {
+            QString _fullPath =
+                QFileInfo(path).path() + "/" + m_projectManager->themePath();
+            s.setValue("qmlstyle", _fullPath);
+            // TODO: Add restart message to apply style path
+            qDebug() << "Setting style to " << _fullPath;
+            QQuickStyle::setStyle(_fullPath);
+        }
         QString path = QDir(m_projectManager->projectLocation()).absoluteFilePath(m_projectManager->workspace());
         setWorkspace(m_projectManager->workspace());
         activateDocument(LiveDocument(m_projectManager->mainDocument()));

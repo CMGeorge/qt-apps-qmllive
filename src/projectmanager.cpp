@@ -41,6 +41,9 @@
 const QLatin1String MainKey("main");
 const QLatin1String WorkspaceKey("workspace");
 const QLatin1String ImportsKey("imports");
+const QLatin1String ThemeKey("qmlstyle");
+const QLatin1String LibsKey("libs");
+const QLatin1String ContextPropeties("contextProperties");
 const QLatin1String QMLLiveExtension(".qmllive");
 
 ProjectManager::ProjectManager(QObject *parent)
@@ -104,6 +107,28 @@ bool ProjectManager::read(const QString &path)
                     }
                 }
             }
+            if (root.contains(LibsKey) && root.value(LibsKey).isArray()) {
+                QJsonArray imports = root.value(LibsKey).toArray();
+                for (QJsonValue value : imports) {
+                    if (workspacedir.exists(value.toString())) {
+                        m_libs.append(
+                            workspacedir.relativeFilePath(value.toString()));
+                    } else {
+                        qWarning() << "Libs path " + value.toString() +
+                                " doesn't exist at " + m_workspace;
+                    }
+                }
+            }
+
+            if (root.contains(ContextPropeties) &&
+                root.value(ContextPropeties).isObject()) {
+                QJsonObject _property = root.value(ContextPropeties).toObject();
+                QStringList _keys = _property.keys();
+                for (int i = 0; i < _keys.length(); i++) {
+                    m_contextProperties.insert(_keys.at(i),
+                                               _property.value(_keys.at(i)));
+                }
+            }
         } else {
             qCritical() << "Workspace path " + workspacestr + " doesn't exist at " + m_projectLocation;
             return false;
@@ -113,6 +138,11 @@ bool ProjectManager::read(const QString &path)
         qCritical() << "Document must contain a workspace path";
         return false;
     }
+    if (root.contains(ThemeKey)) {
+        QString tmpPath = root.value(ThemeKey).toString();
+        m_themePath = tmpPath; /*= QFileInfo(file).path() + "/" + tmpPath;*/
+    }
+    
 
     return true;
 }
@@ -129,10 +159,18 @@ void ProjectManager::write(const QString &path)
     QJsonObject root;
     root.insert(MainKey, QJsonValue(m_mainDocument));
     root.insert(WorkspaceKey, QJsonValue(m_workspace));
+
     QJsonArray imports;
     for (const QString &import : m_imports)
         imports.append(QJsonValue(import));
     root.insert(ImportsKey, imports);
+
+    QJsonArray libs;
+    for (const QString &lib : m_libs)
+        libs.append(QJsonValue(lib));
+    root.insert(LibsKey, libs);
+
+    root.insert(ThemeKey, m_themePath);
     QJsonDocument document(root);
     file.write(document.toJson());
 }
@@ -159,12 +197,21 @@ QStringList ProjectManager::imports() const
 {
     return m_imports;
 }
+QStringList ProjectManager::libs() const
+{
+    return m_libs;
+}
 
+QVariantMap ProjectManager::contextProperties() const
+{
+    return m_contextProperties;
+}
 QString ProjectManager::projectLocation() const
 {
     return m_projectLocation;
 }
 
+QString ProjectManager::themePath() const { return m_themePath; }
 void ProjectManager::reset()
 {
     m_mainDocument = QString("main.qml");
@@ -189,3 +236,14 @@ void ProjectManager::setImports(const QStringList &imports)
     m_imports = imports;
 }
 
+void ProjectManager::setContextProperties(const QVariantMap &contextProperties)
+{
+    m_contextProperties = contextProperties;
+}
+void ProjectManager::setLibs(const QStringList &libs)
+{
+    m_libs = libs;
+}
+void ProjectManager::setThemePath(const QString &themePath) {
+    m_themePath = themePath;
+}
