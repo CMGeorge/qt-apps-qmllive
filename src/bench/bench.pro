@@ -3,7 +3,7 @@ include(../../qmllive.pri)
 TEMPLATE = app
 macx*:TARGET = "QML Live Bench"
 else:TARGET = qmllivebench
-DESTDIR = $$BUILD_DIR/bin
+DESTDIR = $$RELEASE_OUT_DIR #$$BUILD_DIR/bin
 
 CONFIG += c++11
 QT *= gui core quick widgets core-private quickcontrols2
@@ -13,7 +13,7 @@ macx* {
     OBJECTIVE_SOURCES += cocoahelper.mm
     HEADERS += cocoahelper.h
 }
-
+#error($$DESTDIR = $$RELEASE_OUT_DIR)
 SOURCES += \
     aboutdialog.cpp \
     main.cpp \

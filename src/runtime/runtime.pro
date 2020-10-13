@@ -1,7 +1,7 @@
 include(../../qmllive.pri)
 
 TARGET = qmlliveruntime
-DESTDIR = $$BUILD_DIR/bin
+DESTDIR = $$RELEASE_OUT_DIR
 
 QT *= quick
 macx*: CONFIG -= app_bundle
